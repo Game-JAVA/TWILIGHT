@@ -16,3 +16,17 @@ Bem-vindo ao Speedy CoCat, um jogo emocionante desenvolvido em Java com a tecnol
 - *Hospedagem de Código*: GitHub
 - *Metodologia Ágil*: Scrum
 - *IDE*: IntelliJ IDEA
+
+## Regras e Mecanismos: 
+Permanecer o máximo possível pulando entre plataformas, subindo a pontuação enquanto a tela avança continuamente.
+
+Se o personagem cair fora das plataformas ou ser atingido por algum obstáculo e não conseguir alcançar uma plataforma, o jogo termina.
+
+Controles:
+Mover (pular, direita, esquerda)
+
+Interação com plataformas (saltá-las)
+
+Interação com obstáculos (ser atingido)
+
+Ativar boost (impuslo de jump)
