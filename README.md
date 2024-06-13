@@ -8,3 +8,11 @@ Bem-vindo ao Speedy CoCat, um jogo emocionante desenvolvido em Java com a tecnol
 - Plataformas: Pule de uma plataforma para outra e continuar subindo.
 - Obstáculos em Movimento: Fique atento aos obstáculos em movimento. Evite-os para não cair e perder o jogo.
 - Pontuação: Continue subindo o mais alto que puder para alcançar a maior pontuação possível.
+
+## Ferramnetas utilizadas:
+- *Linguagem de Programação*: Java 21+
+- *Biblioteca Gráfica*: JavaFX 21+
+- *Controle de Versão*: Git
+- *Hospedagem de Código*: GitHub
+- *Metodologia Ágil*: Scrum
+- *IDE*: IntelliJ IDEA
