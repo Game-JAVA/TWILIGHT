@@ -30,3 +30,43 @@ Interação com plataformas (saltá-las)
 Interação com obstáculos (ser atingido)
 
 Ativar boost (impuslo de jump)
+
+## Diagrama de Classes:
+
+```mermaid
+classDiagram
+    Screen <|-- Image
+    Image <|-- Player
+    Image <|-- MovingObstacle 
+    Image <|-- StoppedObstacle
+    Sounds --|> Screen
+
+    class Sounds{
+        +noises()
+    }
+
+    class Screen{
+        background
+    }
+
+    class Image{
+        +drawn()
+    }
+
+    class StoppedObstacle{
+    }
+
+    class MovingObstacle{
+        +velocity
+        +move(set x)
+    }
+
+    class Player{
+        +string name
+        +int points
+        +int timeSurvived
+        +jump(set y)
+        +velocity()
+        +move(set x)
+    }
+```
