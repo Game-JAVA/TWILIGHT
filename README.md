@@ -70,3 +70,4 @@ classDiagram
         +move(set x)
     }
 ```
+<a href="https://www.figma.com/board/kEr6QwTs5c5MAFUdw71LDp/Speedy-Cocat?node-id=0-1&t=xxGhsMKnHWxR4R91-0" target="_blank"><img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white" target="_blank"></a>
