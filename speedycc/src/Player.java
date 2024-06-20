@@ -1,8 +1,6 @@
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-
-// Atributos
 public class Player extends Rectangle {
     private String name;
     private int points;
@@ -10,17 +8,18 @@ public class Player extends Rectangle {
     private double velocityY;
     private double gravity = 0.5;
     private double jumpStrength = -10;
+    private int platformCount = 0;
 
     public Player(String name, double width, double height, Color color) {
         super(width, height, color);
         this.name = name;
         this.points = 0;
         this.timeSurvived = 0;
-        this.velocityY = 0;
+        this.velocityY = jumpStrength;
 
-        // Setando a posicão inicial
+        // Setando a posição inicial
         this.setX(360); // posição X
-        this.setY(500); // posição Y
+        this.setY(550); // posição Y (base da tela)
     }
 
     // Método para pular
@@ -40,7 +39,7 @@ public class Player extends Rectangle {
         // Checando limites da tela
         if (this.getX() < 0) {
             this.setX(0);
-        } else if (this.getX() > 800 - this.getWidth()) { // Presumindo tela de 800
+        } else if (this.getX() > 800 - this.getWidth()) { // tela de 800
             this.setX(800 - this.getWidth());
         }
     }
@@ -50,17 +49,21 @@ public class Player extends Rectangle {
         this.updateVelocity();
         this.setY(this.getY() + this.velocityY);
 
-        //Verifica se o player saiu da tela (caiu)
-        if (this.getY() > 600) { // Altura tela em 600
+        // Verifica se o player caiu após pular em mais de uma plataforma
+        if (this.getY() > 600 && platformCount >= 2) { // Altura tela em 600
             gameOver();
         }
+    }
+
+    // Método para incrementar a contagem de plataformas puladas
+    public void incrementPlatformCount() {
+        platformCount++;
     }
 
     // Método para o game over
     public void gameOver() {
         System.out.println("Game Over! " + name + " scored " + points + " points and survived for " + timeSurvived + " seconds.");
-
-        //Lógica adi. de game over
+        // Lógica adicional de game over
     }
 
     // Getters and setters
