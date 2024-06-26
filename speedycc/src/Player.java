@@ -1,86 +1,81 @@
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+public class Player extends ImageView {
+    private double velocityY; // Velocidade vertical do jogador
+    private final double gravity = 0.5; // Gravidade aplicada ao jogador
+    private final double jumpStrength = -17; // Força do pulo do jogador
+    private boolean onPlataform; // Verifica se o jogador está em uma plataforma
+    private int plataformsJumped; // Contador de plataformas puladas
+    private Rectangle collisionBox; // Caixa de colisão
 
-// Atributos
-public class Player extends Rectangle {
-    private String name;
-    private int points;
-    private int timeSurvived;
-    private double velocityY;
-    private double gravity = 0.5;
-    private double jumpStrength = -10;
+    public Player(String imagePath) {
+        Image image = new Image(imagePath);
+        this.setImage(image);
+        this.setFitWidth(50); // Ajuste o tamanho conforme necessário
+        this.setFitHeight(50); // Ajuste o tamanho conforme necessário
+        this.velocityY = jumpStrength; // Inicia pulando automaticamente
+        this.setX(375); // Posição inicial X (centro horizontal da tela)
+        this.setY(200); // Posição inicial Y (na base da tela)
+        this.onPlataform = false;
+        this.plataformsJumped = 0;
 
-    public Player(String name, double width, double height, Color color) {
-        super(width, height, color);
-        this.name = name;
-        this.points = 0;
-        this.timeSurvived = 0;
-        this.velocityY = 0;
-
-        // Setando a posicão inicial
-        this.setX(360); // posição X
-        this.setY(500); // posição Y
+        // Cria a caixa de colisão invisível
+        double collisionBoxWidth = this.getFitWidth();
+        double collisionBoxHeight = this.getFitHeight() / 3; // Ajuste a altura para capturar a base da imagem
+        collisionBox = new Rectangle(collisionBoxWidth, collisionBoxHeight);
+        collisionBox.setFill(Color.TRANSPARENT); // Torna a caixa de colisão invisível
+        updateCollisionBox(); // Inicializa a posição da caixa de colisão
     }
 
-    // Método para pular
+    // Função para o jogador pular
     public void jump() {
         this.velocityY = jumpStrength;
     }
 
-    // Método para atualizar a velocidade (cair/efeito de gravidade)
-    public void updateVelocity() {
-        this.velocityY += gravity;
-    }
-
-    // Método para mover na horizontal
-    public void move(double x) {
-        this.setX(this.getX() + x);
-
-        // Checando limites da tela
-        if (this.getX() < 0) {
-            this.setX(0);
-        } else if (this.getX() > 800 - this.getWidth()) { // Presumindo tela de 800
-            this.setX(800 - this.getWidth());
+    // Atualiza a posição do jogador
+    public void update() {
+        if (!onPlataform) {
+            this.velocityY += gravity;
         }
-    }
-
-    // Método p/ atualizar a posição do player
-    public void updatePosition() {
-        this.updateVelocity();
         this.setY(this.getY() + this.velocityY);
-
-        //Verifica se o player saiu da tela (caiu)
-        if (this.getY() > 600) { // Altura tela em 600
-            gameOver();
-        }
+        this.updateCollisionBox(); // Atualiza a posição da caixa de colisão
     }
 
-    // Método para o game over
-    public void gameOver() {
-        System.out.println("Game Over! " + name + " scored " + points + " points and survived for " + timeSurvived + " seconds.");
-
-        //Lógica adi. de game over
+    // Atualiza a posição da caixa de colisão
+    public void updateCollisionBox() {
+        collisionBox.setX(this.getX());
+        collisionBox.setY(this.getY() + (this.getFitHeight() - collisionBox.getHeight()));
     }
 
-    // Getters and setters
-    public String getName() {
-        return name;
-    }
-
-    public int getPoints() {
-        return points;
-    }
-
-    public int getTimeSurvived() {
-        return timeSurvived;
-    }
-
+    // Getters e setters
     public double getVelocityY() {
         return velocityY;
     }
 
     public void setVelocityY(double velocityY) {
         this.velocityY = velocityY;
+    }
+
+    public boolean isOnPlataform() {
+        return onPlataform;
+    }
+
+    public void setOnPlataform(boolean onPlataform) {
+        this.onPlataform = onPlataform;
+    }
+
+    public int getPlataformsJumped() {
+        return plataformsJumped;
+    }
+
+    public void incrementPlataformsJumped() {
+        this.plataformsJumped++;
+    }
+
+    public Rectangle getCollisionBox() {
+        return collisionBox;
     }
 }
