@@ -1,10 +1,13 @@
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
-public class Plataform extends Rectangle {
-    public Plataform(double x, double y, double width, double height, Color color) {
-        super(width, height, color);
-        this.setX(x); // Posição X da plataforma
-        this.setY(y); // Posição Y da plataforma
+public class Plataform extends ImageView {
+    public Plataform(double x, double y, String imagePath) {
+        Image image = new Image(imagePath);
+        this.setImage(image);
+        this.setX(x);
+        this.setY(y);
+        this.setFitWidth(80); // Ajuste o tamanho conforme necessário
+        this.setFitHeight(20); // Ajuste o tamanho conforme necessário
     }
 }
