@@ -2,7 +2,6 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -27,8 +26,9 @@ public class Game extends Application {
 
         gamePane = new Pane();
         Scene scene = new Scene(gamePane, windowWidth, windowHeight);
-        player = new Player(50, 50, Color.BLUE); // Criação do jogador
+        player = new Player("imagens/sprite gato2.png"); // Criação do jogador com a sprite
         gamePane.getChildren().add(player); // Adiciona o jogador ao gamePane
+        gamePane.getChildren().add(player.getCollisionBox()); // Adiciona a caixa de colisão ao gamePane
 
         plataforms = new ArrayList<>();
         createInitialPlataforms(); // Cria as plataformas iniciais
@@ -38,9 +38,11 @@ public class Game extends Application {
             switch (event.getCode()) {
                 case LEFT:
                     player.setX(player.getX() - 50); // Move o jogador para a esquerda
+                    player.updateCollisionBox(); // Atualiza a posição da caixa de colisão
                     break;
                 case RIGHT:
                     player.setX(player.getX() + 50); // Move o jogador para a direita
+                    player.updateCollisionBox(); // Atualiza a posição da caixa de colisão
                     break;
             }
         });
@@ -52,6 +54,7 @@ public class Game extends Application {
                 player.update(); // Atualiza a posição do jogador
                 checkCollisions(); // Verifica colisões
                 scrollScreen(); // Move a tela conforme necessário
+
                 // Verifica se o jogador caiu da tela e já pulou em pelo menos 2 plataformas
                 if (player.getY() > windowHeight && player.getPlataformsJumped() >= 2) {
                     gameOver(); // Chama a função de Game Over
@@ -70,7 +73,7 @@ public class Game extends Application {
         for (int i = 0; i < 5; i++) {
             double x = new Random().nextDouble() * (windowWidth - 100);
             double y = lastPlataformY - 100;
-            Plataform plataform = new Plataform(x, y, 100, 20, Color.GREEN);
+            Plataform plataform = new Plataform(x, y, "imagens/sprite nuvem2.png");
             plataforms.add(plataform);
             gamePane.getChildren().add(plataform);
             lastPlataformY = y;
@@ -81,7 +84,7 @@ public class Game extends Application {
     private void createPlataform() {
         double x = new Random().nextDouble() * (windowWidth - 100);
         double y = lastPlataformY - 100;
-        Plataform plataform = new Plataform(x, y, 100, 20, Color.GREEN);
+        Plataform plataform = new Plataform(x, y, "imagens/sprite nuvem2.png");
         plataforms.add(plataform);
         gamePane.getChildren().add(plataform);
         lastPlataformY = y;
@@ -91,9 +94,9 @@ public class Game extends Application {
     private void checkCollisions() {
         player.setOnPlataform(false);
         for (Plataform plataform : plataforms) {
-            if (player.getBoundsInParent().intersects(plataform.getBoundsInParent())) {
+            if (player.getCollisionBox().getBoundsInParent().intersects(plataform.getBoundsInParent())) {
                 if (player.getVelocityY() > 0) {
-                    player.setY(plataform.getY() - player.getHeight());
+                    player.setY(plataform.getY() - player.getFitHeight());
                     player.setVelocityY(0);
                     player.setOnPlataform(true);
                     if (player.getY() < windowHeight) {
@@ -110,6 +113,7 @@ public class Game extends Application {
         if (player.getY() < windowHeight / 2) {
             double dy = windowHeight / 2 - player.getY();
             player.setY(windowHeight / 2);
+            player.updateCollisionBox(); // Atualiza a posição da caixa de colisão
 
             for (Plataform plataform : plataforms) {
                 plataform.setY(plataform.getY() + dy);
