@@ -13,7 +13,7 @@ public class Game extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Game.class.getResource("GameMenu.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+        Scene scene = new Scene(fxmlLoader.load(), 800, 600);
         String css = this.getClass().getResource("stylesheet.css").toExternalForm();
         scene.getStylesheets().add(css);
         stage.setTitle("SpeedyCoCat");

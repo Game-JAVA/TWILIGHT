@@ -62,7 +62,7 @@ public class ScreenController {
     public void switchToScene() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("GameMenu.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+            Scene scene = new Scene(fxmlLoader.load(), windowWidth, windowHeight);
             String css = this.getClass().getResource("stylesheet.css").toExternalForm();
             scene.getStylesheets().add(css);
             stage.setTitle("Hello!");
@@ -77,7 +77,7 @@ public class ScreenController {
         FXMLLoader fxmlLoader = new FXMLLoader(Game.class.getResource("GameLoad.fxml"));
         Pane root = fxmlLoader.load();
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        Scene scene = new Scene(root, 600, 400);
+        Scene scene = new Scene(root, windowWidth, windowHeight);
         String css = Objects.requireNonNull(this.getClass().getResource("stylesheet.css")).toExternalForm();
         scene.getStylesheets().add(css);
         ImageView imageView = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("catrun.gif"))));
@@ -217,7 +217,7 @@ public class ScreenController {
     public void switchToScene1() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("GameMenu.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+            Scene scene = new Scene(fxmlLoader.load(), windowWidth, windowHeight);
             String css = this.getClass().getResource("stylesheet.css").toExternalForm();
             scene.getStylesheets().add(css);
             stage.setScene(scene);
