@@ -1,7 +1,11 @@
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -16,6 +20,12 @@ public class Game extends Application {
     private final int windowWidth = 800; // Largura da janela
     private final int windowHeight = 600; // Altura da janela
     private double lastPlataformY = 500; // Posição Y da última plataforma
+    private int score = 0; // Atributo de pontuação
+    private Text scoreText; // Txt pontuação
+    private SoundEffect backgroundSound = new SoundEffect("sounds/backgroundmusic2.wav", true);
+    private SoundEffect jumpSound = new SoundEffect("sounds/jumpsound2 (1).wav", false);
+    private SoundEffect gameoverSound = new SoundEffect("sounds/gameoversound.wav", false);
+    private ImageView backgroundImageView = new ImageView("sprites/backgroungame.png"); //imagem de fundo
 
     public static void main(String[] args) {
         launch(args); // Inicializa o JavaFX
@@ -25,8 +35,20 @@ public class Game extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Speedy CoCat"); // Título da janela
 
+        // Objeto som
+        backgroundSound.play();
+
         gamePane = new Pane();
         Scene scene = new Scene(gamePane, windowWidth, windowHeight);
+        scene.setFill(Color.rgb(0,183,240));
+
+        // Adiciona a imagem de fundo
+        Image backgroundImage = new Image("sprites/backgroungame.png");
+        backgroundImageView = new ImageView(backgroundImage);
+        backgroundImageView.setFitWidth(windowWidth);
+        backgroundImageView.setFitHeight(windowHeight);
+        gamePane.getChildren().add(backgroundImageView); // Adiciona a imagem de fundo ao gamePane
+
         player = new Player("sprites/sprite gato2.png"); // Criação do jogador com a sprite
         gamePane.getChildren().add(player); // Adiciona o jogador ao gamePane
         gamePane.getChildren().add(player.getCollisionBox()); // Adiciona a caixa de colisão ao gamePane
@@ -34,18 +56,30 @@ public class Game extends Application {
         plataforms = new ArrayList<>();
         movingObstacles = new ArrayList<>();
         createInitialPlataforms(); // Cria as plataformas iniciais
-        createInitialMovingObstacles(); // Cria os obstáculos móveis iniciais
+//        createInitialMovingObstacles(); // Cria os obstáculos móveis iniciais
+
+        // Inicializa o txt de pontuação
+        scoreText = new Text(10, 20, "Pontuação: 0");
+        scoreText.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        gamePane.getChildren().add(scoreText);
 
         // Configura o controle do jogador com teclas
         scene.setOnKeyPressed(event -> {
             switch (event.getCode()) {
                 case LEFT:
-                    player.setX(player.getX() - 50); // Move o jogador para a esquerda
-                    player.updateCollisionBox(); // Atualiza a posição da caixa de colisão
+                    player.moveLeft(); // Aplica aceleração para a esquerda
                     break;
                 case RIGHT:
-                    player.setX(player.getX() + 50); // Move o jogador para a direita
-                    player.updateCollisionBox(); // Atualiza a posição da caixa de colisão
+                    player.moveRight(); // Aplica aceleração para a direita
+                    break;
+            }
+        });
+
+        scene.setOnKeyReleased(event -> {
+            switch (event.getCode()) {
+                case LEFT:
+                case RIGHT:
+                    player.accelerationX = 0; // Para a aceleração quando a tecla é solta
                     break;
             }
         });
@@ -74,10 +108,10 @@ public class Game extends Application {
 
     // Cria as plataformas iniciais
     private void createInitialPlataforms() {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 12; i++) {
             double x = new Random().nextDouble() * (windowWidth - 100);
-            double y = lastPlataformY - 100;
-            Plataform plataform = new Plataform(x, y, "sprites/sprite nuvem2.png");
+            double y = lastPlataformY - 50;
+            Plataform plataform = new Plataform(x, y, "sprites/spritegrama.png");
             plataforms.add(plataform);
             gamePane.getChildren().add(plataform);
             lastPlataformY = y;
@@ -85,16 +119,7 @@ public class Game extends Application {
     }
 
     // Cria os obstáculos móveis iniciais
-    private void createInitialMovingObstacles() {
-        for (int i = 0; i < 3; i++) {
-            double x = new Random().nextDouble() * (windowWidth - 100);
-            double y = lastPlataformY - 100;
-            MovingObstacle movingObstacle = new MovingObstacle(x, y, "sprites/spriteAviao.png");
-            movingObstacles.add(movingObstacle);
-            gamePane.getChildren().add(movingObstacle);
-            lastPlataformY = y;
-        }
-    }
+
 
     // Atualiza a posição dos obstáculos móveis
     private void updateMovingObstacles() {
@@ -113,7 +138,7 @@ public class Game extends Application {
         lastPlataformY = y;
     }
 
-    // Verifica colisões entre o jogador, as plataformas e os obstáculos móveis
+    // Verifica colisões entre o jogador, plataformas e obstáculos móveis
     private void checkCollisions() {
         player.setOnPlataform(false);
         for (Plataform plataform : plataforms) {
@@ -122,9 +147,15 @@ public class Game extends Application {
                     player.setY(plataform.getY() - player.getFitHeight());
                     player.setVelocityY(0);
                     player.setOnPlataform(true);
+                    jumpSound.play();
+
                     if (player.getY() < windowHeight) {
                         player.incrementPlataformsJumped();
                         player.jump();
+
+                        // Incrementa a pontuação e atualiza
+                        score += 1; //pontos por plataforma
+                        scoreText.setText("Pontuação: " + score);
                     }
                 }
             }
@@ -135,9 +166,15 @@ public class Game extends Application {
                     player.setY(movingObstacle.getY() - player.getFitHeight());
                     player.setVelocityY(0);
                     player.setOnPlataform(true);
+                    jumpSound.play();
+
                     if (player.getY() < windowHeight) {
                         player.incrementPlataformsJumped();
                         player.jump();
+
+                        // Incrementa a pontuação e atualiza
+                        score += 1; //pontos por obstáculo móvel
+                        scoreText.setText("Pontuação: " + score);
                     }
                 }
             }
@@ -150,6 +187,8 @@ public class Game extends Application {
             double dy = windowHeight / 2 - player.getY();
             player.setY(windowHeight / 2);
             player.updateCollisionBox(); // Atualiza a posição da caixa de colisão
+
+            backgroundImageView.setY(backgroundImageView.getY() + dy); // Atualiza a posição da imagem de fundo
 
             for (Plataform plataform : plataforms) {
                 plataform.setY(plataform.getY() + dy);
@@ -185,9 +224,11 @@ public class Game extends Application {
         lastPlataformY = y;
     }
 
-    // mensagem de Game Over
+    //lógica de fim de jogo
     private void gameOver() {
-        System.out.println("TESTING ok");
-        // lógica de game over aqui
+        gameoverSound.play();
+        Text gameOverText = new Text(windowWidth / 2 - 50, windowHeight / 2, "Game Over");
+        gameOverText.setStyle("-fx-font-size: 36px; -fx-font-weight: bold;");
+        gamePane.getChildren().add(gameOverText);
     }
 }

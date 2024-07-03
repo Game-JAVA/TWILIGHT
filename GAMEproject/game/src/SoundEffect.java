@@ -1,4 +1,3 @@
-
 import java.io.InputStream;
 import javax.sound.sampled.*;
 
@@ -6,16 +5,17 @@ public class SoundEffect implements Runnable {
 
     // Atributos
     private String audioPath;
-    private boolean loop;
+    private boolean loop, stop;
 
-    //Contrutores
+    // Construtores
     public SoundEffect(String audioPath, boolean loop) {
         this.audioPath = audioPath;
         this.loop = loop;
+        this.stop = false;
     }
 
-    // M�todos espec�ficos
-    public void play () {
+    // Métodos específicos
+    public void play() {
         Thread t = new Thread(this);
         t.start();
     }
@@ -23,49 +23,57 @@ public class SoundEffect implements Runnable {
     @Override
     public void run() {
         try {
-            // Inicia a reprodu��o em loop infinito
-            do{
-                // Cria um novo fluxo de entrada de �udio a partir do arquivo original
+            // Inicia a reprodução em loop infinito
+            do {
+                // Cria um novo fluxo de entrada de áudio a partir do arquivo original
                 InputStream inputStream = SoundEffect.class.getResourceAsStream(audioPath);
                 AudioInputStream copiedStream = AudioSystem.getAudioInputStream(inputStream);
 
-                // Obt�m o formato de �udio do arquivo .wav
+                // Obtém o formato de áudio do arquivo .wav
                 AudioFormat audioFormat = copiedStream.getFormat();
 
-                // Cria um DataLine.Info para a linha de reprodu��o
+                // Cria um DataLine.Info para a linha de reprodução
                 DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
 
-                // Obt�m a linha de reprodu��o do sistema
+                // Obtém a linha de reprodução do sistema
                 SourceDataLine line = (SourceDataLine) AudioSystem.getLine(info);
 
-                // Abre novamente a linha de reprodu��o
+                // Abre novamente a linha de reprodução
                 line.open(audioFormat);
 
-                // Inicia a reprodu��o
+                // Inicia a reprodução
                 line.start();
 
-                // Cria um buffer para armazenar os dados do �udio
+                // Cria um buffer para armazenar os dados do áudio
                 byte[] buffer = new byte[4096];
-                int bytesRead = 0;
+                int bytesRead;
 
-                // L� dados do �udio do InputStream e escreve na linha de reprodu��o
+                // Lê dados do áudio do InputStream e escreve na linha de reprodução
                 while ((bytesRead = copiedStream.read(buffer)) != -1) {
                     line.write(buffer, 0, bytesRead);
+
+                    // Verifica se a reprodução deve parar
+                    if (stop) {
+                        line.stop();
+                        line.close();
+                        copiedStream.close();
+                        return;
+                    }
                 }
 
-                // Encerra a reprodu��o
+                // Encerra a reprodução
                 line.drain();
                 line.stop();
                 line.close();
                 copiedStream.close();
-            }while (loop);
+            } while (loop && !stop);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // M�todos de acesso
+    // Métodos de acesso
     public boolean isLoop() {
         return loop;
     }
@@ -74,4 +82,7 @@ public class SoundEffect implements Runnable {
         this.loop = loop;
     }
 
+    public void stop() {
+        this.stop = true;
+    }
 }
