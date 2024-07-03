@@ -9,7 +9,6 @@ import java.io.IOException;
 
 public class Game extends Application {
 
-    private Stage primaryStage;
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Game.class.getResource("GameMenu.fxml"));

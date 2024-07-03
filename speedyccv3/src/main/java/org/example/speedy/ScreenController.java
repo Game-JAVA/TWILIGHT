@@ -37,6 +37,8 @@ public class ScreenController {
     @FXML
     private AnchorPane screen2;
     @FXML
+    private AnchorPane gameOverScreen;
+    @FXML
     private ImageView cat;
     private Scene scene;
     private Stage stage;
@@ -55,24 +57,10 @@ public class ScreenController {
     private Scene pauseScene;
 
 
+
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-
-    public void switchToScene() {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("GameMenu.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), windowWidth, windowHeight);
-            String css = this.getClass().getResource("stylesheet.css").toExternalForm();
-            scene.getStylesheets().add(css);
-            stage.setTitle("Hello!");
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void switchToLoad(ActionEvent event) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Game.class.getResource("GameLoad.fxml"));
         Pane root = fxmlLoader.load();
@@ -88,7 +76,7 @@ public class ScreenController {
         AnchorPane.setBottomAnchor(imageView, 10.0);
         AnchorPane.setRightAnchor(imageView, 10.0);
         root.getChildren().add(imageView);
-        stage.setTitle("Hello!");
+        stage.setTitle("Speddy CoCat");
         stage.setScene(scene);
         stage.show();
 
@@ -140,7 +128,11 @@ public class ScreenController {
                     checkCollisions();
                     scrollScreen();
                     if (player.getY() > windowHeight && player.getPlataformsJumped() >= 0) {
-                        gameOver();
+                        try {
+                            gameOver();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
             }
@@ -206,11 +198,11 @@ public class ScreenController {
         }
     }
 
-    private void gameOver() {
+    private void gameOver() throws IOException {
         if (!isGameOver) {
             isGameOver = true;
             System.out.println("Game Over");
-            switchToScene1(); // Chama a função para mudar de cena
+            switchToGameOver(); // Chama a função para mudar de cena
         }
     }
 
@@ -241,7 +233,7 @@ public class ScreenController {
     public void switchToPause() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Pause.fxml"));
-            pauseScene = new Scene(fxmlLoader.load(), 600, 400);
+            pauseScene = new Scene(fxmlLoader.load(), windowWidth, windowHeight);
             String css = this.getClass().getResource("stylesheet.css").toExternalForm();
             pauseScene.getStylesheets().add(css);
             stage.setScene(pauseScene);
@@ -261,5 +253,23 @@ public class ScreenController {
     public void switchToGame() {
         stage.setScene(gameScene);
         stage.show();
+    }
+
+    public void switchToGameOver() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(Game.class.getResource("GameOver.fxml"));
+        Pane root = fxmlLoader.load();
+        Scene scene = new Scene(root, windowWidth, windowHeight);
+        String css = Objects.requireNonNull(this.getClass().getResource("stylesheet.css")).toExternalForm();
+        scene.getStylesheets().add(css);
+        stage.setTitle("SpeedyCoCat");
+        stage.setScene(scene);
+        stage.show();
+
+        // Configura a transição para a próxima cena após 4 segundos
+        PauseTransition delay = new PauseTransition(Duration.seconds(4));
+        delay.setOnFinished(e -> {
+            switchToScene1(); // Muda para a próxima cena
+        });
+        delay.play();
     }
 }

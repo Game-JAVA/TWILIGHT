@@ -6,6 +6,10 @@
     -fx-background-image: url('teladeload.png');
     -fx-background-size: cover;
 }
+#gameOverScreen{
+    -fx-background-image: url('gatogaov.png');
+    -fx-background-size: cover;
+}
 #cat{
     -fx-background-image: url('catrun.gif');
     -fx-background-size: cover;
