@@ -15,17 +15,13 @@
                 </font>
             </Label>
             <VBox alignment="CENTER" spacing="10.0">
-                <Button fx:id="playButton" mnemonicParsing="false" onAction="#switchToLoad" prefHeight="30.0" prefWidth="100.0" text="Play" styleClass="button-colored-border">
+                <!--Botão de Play que está posicionado no centro da tela, quando interagido, chama o "onAction" que vai para o metodo "switchToLoad" na classe screenControler-->
+                <Button fx:id="playButton" mnemonicParsing="false" onAction="#switchToLoad" prefHeight="30.0" prefWidth="100.0" text="Play">
                     <font>
                         <Font name="Calibri" size="12.0" />
                     </font>
                 </Button>
-                <Button fx:id="settingsButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Settings" styleClass="button-colored-border">
-                    <font>
-                        <Font name="Calibri" size="12.0" />
-                    </font>
-                </Button>
-                <Button fx:id="exitButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Exit" styleClass="button-colored-border" />
+                <Button fx:id="exitButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Exit"/>
             </VBox>
         </VBox>
     </children>

@@ -14,6 +14,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -43,13 +45,16 @@ public class ScreenController {
     private Scene scene;
     private Stage stage;
     private FXMLLoader fxmlLoader;
-
-    private Player player; // Instância do jogador
-    private List<Plataform> plataforms; // Lista de plataformas
-    private Pane gamePane; // Pane do jogo
-    private final int windowWidth = 800; // Largura da janela
-    private final int windowHeight = 600; // Altura da janela
-    private double lastPlataformY = 500; // Posição Y da última plataforma
+    private Player player;
+    private List<Plataform> plataforms;
+    private List<MovingObstacle> movingObstacles;
+    private Pane gamePane;
+    private final int windowWidth = 800;
+    private final int windowHeight = 600;
+    private double lastPlataformY = 500;
+    private int score = 0;
+    private Text scoreText;
+    private ImageView backgroundImageView;
     private boolean isPaused = false;
     private boolean isGameOver = false;
     private AnimationTimer timer;
@@ -61,6 +66,8 @@ public class ScreenController {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
+
+    //método da tela de carregamento do jogo que aparece quando play é pressionado
     public void switchToLoad(ActionEvent event) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Game.class.getResource("GameLoad.fxml"));
         Pane root = fxmlLoader.load();
@@ -92,17 +99,31 @@ public class ScreenController {
         delay.play();
     }
 
+    //método responsavel por conter a lógica do jogo
     public void gameStart() throws IOException {
         stage.setTitle("Speedy CoCat");
-
         gamePane = new Pane();
-        gameScene = new Scene(gamePane, windowWidth, windowHeight);
-        player = new Player("sprite gato2.png"); // Criação do jogador com a sprite
-        gamePane.getChildren().add(player); // Adiciona o jogador ao gamePane
-        gamePane.getChildren().add(player.getCollisionBox()); // Adiciona a caixa de colisão ao gamePane
+
+        gameScene = new Scene(gamePane, windowWidth, windowHeight); // Inicialize corretamente a gameScene
+        gameScene.setFill(Color.rgb(0, 183, 240));
+
+        // Adiciona a imagem de fundo
+        backgroundImageView = new ImageView(new Image("backgroundgame.png"));
+        backgroundImageView.setFitWidth(windowWidth);
+        backgroundImageView.setFitHeight(windowHeight);
+        gamePane.getChildren().add(backgroundImageView);
+
+        player = new Player("sprite gato2.png");
+        gamePane.getChildren().add(player);
+        gamePane.getChildren().add(player.getCollisionBox());
 
         plataforms = new ArrayList<>();
+        movingObstacles = new ArrayList<>();
         createInitialPlataforms();
+
+        scoreText = new Text(10, 20, "Pontuação: 0");
+        scoreText.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        gamePane.getChildren().add(scoreText);
 
         gameScene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
@@ -111,28 +132,39 @@ public class ScreenController {
             if (!isPaused && !isGameOver) {
                 switch (event.getCode()) {
                     case LEFT:
-                        player.setX(player.getX() - 50);
+                        player.moveLeft();
                         break;
                     case RIGHT:
-                        player.setX(player.getX() + 50);
+                        player.moveRight();
                         break;
                 }
+            }
+        });
+
+        gameScene.setOnKeyReleased(event -> {
+            switch (event.getCode()) {
+                case LEFT:
+                case RIGHT:
+                    player.accelerationX = 0;
+                    break;
             }
         });
 
         timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (!isPaused && !isGameOver) {
-                    player.update();
-                    checkCollisions();
-                    scrollScreen();
-                    if (player.getY() > windowHeight && player.getPlataformsJumped() >= 0) {
-                        try {
-                            gameOver();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
+                player.update();
+                updateMovingObstacles();
+                checkCollisions();
+                scrollScreen();
+
+                //condição que valida que o jogador caiu fora do mapa
+                if (player.getY() > windowHeight && player.getPlataformsJumped() >= 0) {
+                    try {
+                        gameOver();
+                        stop();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
                 }
             }
@@ -143,14 +175,22 @@ public class ScreenController {
         stage.show();
     }
 
+
+
     private void createInitialPlataforms() {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 15; i++) {
             double x = new Random().nextDouble() * (windowWidth - 100);
-            double y = lastPlataformY - 100;
-            Plataform plataform = new Plataform(x, y, "sprite nuvem2.png");
+            double y = lastPlataformY - 50;
+            Plataform plataform = new Plataform(x, y, "spritegrama.png");
             plataforms.add(plataform);
             gamePane.getChildren().add(plataform);
             lastPlataformY = y;
+        }
+    }
+
+    private void updateMovingObstacles() {
+        for (MovingObstacle movingObstacle : movingObstacles) {
+            movingObstacle.update();
         }
     }
 
@@ -163,27 +203,49 @@ public class ScreenController {
         lastPlataformY = y;
     }
 
-    private void checkCollisions() {
+    public void checkCollisions() {
         player.setOnPlataform(false);
         for (Plataform plataform : plataforms) {
-            if (player.getBoundsInParent().intersects(plataform.getBoundsInParent())) {
+            if (player.getCollisionBox().getBoundsInParent().intersects(plataform.getBoundsInParent())) {
                 if (player.getVelocityY() > 0) {
                     player.setY(plataform.getY() - player.getFitHeight());
                     player.setVelocityY(0);
                     player.setOnPlataform(true);
+
                     if (player.getY() < windowHeight) {
                         player.incrementPlataformsJumped();
                         player.jump();
+                        score += 1;
+                        scoreText.setText("Pontuação: " + score);
+                    }
+                }
+            }
+        }
+        for (MovingObstacle movingObstacle : movingObstacles) {
+            if (player.getCollisionBox().getBoundsInParent().intersects(movingObstacle.getBoundsInParent())) {
+                if (player.getVelocityY() > 0) {
+                    player.setY(movingObstacle.getY() - player.getFitHeight());
+                    player.setVelocityY(0);
+                    player.setOnPlataform(true);
+
+                    if (player.getY() < windowHeight) {
+                        player.incrementPlataformsJumped();
+                        player.jump();
+                        score += 1;
+                        scoreText.setText("Pontuação: " + score);
                     }
                 }
             }
         }
     }
 
-    private void scrollScreen() {
+    public void scrollScreen() {
         if (player.getY() < windowHeight / 2) {
             double dy = windowHeight / 2 - player.getY();
             player.setY(windowHeight / 2);
+            player.updateCollisionBox();
+
+            backgroundImageView.setY(backgroundImageView.getY() + dy);
 
             for (Plataform plataform : plataforms) {
                 plataform.setY(plataform.getY() + dy);
@@ -193,11 +255,32 @@ public class ScreenController {
             }
             plataforms.removeIf(plataform -> plataform.getY() > windowHeight);
 
+            for (MovingObstacle movingObstacle : movingObstacles) {
+                movingObstacle.setY(movingObstacle.getY() + dy);
+                if (movingObstacle.getY() > windowHeight) {
+                    gamePane.getChildren().remove(movingObstacle);
+                }
+            }
+            movingObstacles.removeIf(movingObstacle -> movingObstacle.getY() > windowHeight);
+
             lastPlataformY += dy;
             createPlataform();
+            if (new Random().nextBoolean()) {
+                createMovingObstacle();
+            }
         }
     }
 
+    private void createMovingObstacle() {
+        double x = new Random().nextDouble() * (windowWidth - 100);
+        double y = lastPlataformY - 100;
+        MovingObstacle movingObstacle = new MovingObstacle(x, y, "spriteAviao.png");
+        movingObstacles.add(movingObstacle);
+        gamePane.getChildren().add(movingObstacle);
+        lastPlataformY = y;
+    }
+
+    //Método que valida que o jogador perdeu
     private void gameOver() throws IOException {
         if (!isGameOver) {
             isGameOver = true;
@@ -206,6 +289,7 @@ public class ScreenController {
         }
     }
 
+    //Método que vai para o menu quando switchToGameOver é chamado
     public void switchToScene1() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("GameMenu.fxml"));
@@ -219,17 +303,20 @@ public class ScreenController {
         }
     }
 
+    //Método pause
     private void togglePause() {
         isPaused = !isPaused;
         if (isPaused) {
-            switchToPause();
+            timer.stop(); // Pausa o jogo
+            switchToPause(); // Alterna para a tela de pausa
             System.out.println("Game Paused");
         } else {
-            switchToGame();
+            timer.start(); // Retoma o jogo
             System.out.println("Game Resumed");
         }
     }
 
+    //Método da tela de pause
     public void switchToPause() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Pause.fxml"));
@@ -250,11 +337,13 @@ public class ScreenController {
         }
     }
 
+    //Método que salva o estado do jogo para exibir após o pause
     public void switchToGame() {
         stage.setScene(gameScene);
         stage.show();
     }
 
+    //método que exibe a tela de game over e após quatro segundos vai para o menu
     public void switchToGameOver() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Game.class.getResource("GameOver.fxml"));
         Pane root = fxmlLoader.load();
