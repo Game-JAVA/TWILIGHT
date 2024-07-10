@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="background" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.speedy.ScreenController">
+    <children>
+        <VBox alignment="CENTER" spacing="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <Label fx:id="gameTittle" text="Speedy CoCat">
+                <font>
+                    <Font name="Georgia" size="72.0" />
+                </font>
+            </Label>
+            <VBox alignment="CENTER" spacing="10.0">
+                <!--Botão de Play que está posicionado no centro da tela, quando interagido, chama o "onAction" que vai para o metodo "switchToLoad" na classe screenControler-->
+                <Button fx:id="playButton" mnemonicParsing="false" onAction="#switchToLoad" prefHeight="30.0" prefWidth="100.0" text="Play">
+                    <font>
+                        <Font name="Calibri" size="12.0" />
+                    </font>
+                </Button>
+                <Button fx:id="exitButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Exit"/>
+            </VBox>
+        </VBox>
+    </children>
+</AnchorPane>
