@@ -1,0 +1,36 @@
+#background{
+    -fx-background-image: url('backgroungame.png');
+    -fx-background-size: cover;
+}
+#screen2{
+    -fx-background-image: url('teladeload.png');
+    -fx-background-size: cover;
+}
+#gameOverScreen{
+    -fx-background-image: url('gatogaov.png');
+    -fx-background-size: cover;
+}
+#cat{
+    -fx-background-image: url('catrun.gif');
+    -fx-background-size: cover;
+}
+
+.Label{
+    -fx-font-size:40;
+    -fx-text-fill: "white";
+}
+
+#gameTittle{
+    -fx-font-size: 90;
+    -fx-font-family: "Lucida Console";
+    -fx-text-fill: "white";
+    -fx-alignment: center;
+}
+.button{
+    -fx-background-color: "black";
+    -fx-text-fill: "white";
+}
+.button:hover{
+    -fx-background-color: #EEEEEE;
+    -fx-text-fill: "black";
+}
