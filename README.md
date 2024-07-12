@@ -34,31 +34,19 @@ Esse jogo foi baseado no app mobile POU, o qual temos uma espécie de "pet" virt
 
 Acesse o link para referência: https://youtube.com/shorts/gebBM5YTWbE?si=araHty7H0jiX_ai-
 
-## Informações de funcionamento (técnico):
-### Player
-Atributos
+## Descrição de funcionamento (técnico):
+### Classes
+    ScreenController gerencia as transições entre telas e a lógica do jogo, incluindo inicialização, controle de movimentos do jogador, colisões, atualização de plataformas e obstáculos, pausa e fim de jogo.
 
-    velocityY e velocityX: Representam as velocidades vertical e horizontal do jogador.
-    accelerationX: A aceleração horizontal aplicada ao jogador.
-    gravity: Um valor constante que simula o efeito da gravidade no jogador.
-    jumpStrength: A força aplicada quando o jogador pula.
-    friction: O coeficiente de atrito para suavizar o movimento horizontal do jogador.
-    onPlataform: Um booleano que indica se o jogador está em uma plataforma.
-    plataformsJumped: Um contador para o número de plataformas puladas pelo jogador.
-    collisionBox: Um retângulo usado para detecção de colisões.
+    Game é a classe principal que inicializa o jogo JavaFX. Ela carrega o arquivo FXML que define o menu principal (GameMenu.fxml), cria uma cena com base nesse arquivo FXML, adiciona um arquivo CSS para estilização, define o título da janela do jogo, e mostra a cena na janela do jogo. O método main() é o ponto de entrada do aplicativo Java e invoca o método launch() para iniciar o aplicativo JavaFX.
 
-Construtor
-    
-    Inicializa a imagem do jogador, tamanho, posição, velocidades e a caixa de colisão.
+    Player representa o jogador do jogo, estendendo ImageView do JavaFX para exibir uma imagem do jogador. Ela controla a física do jogador, incluindo movimento, pulo, gravidade, atrito e detecção de colisão através de uma caixa de colisão invisível.
 
-Métodos
+    Plataform é responsável por representar uma plataforma no jogo, estendendo ImageView do JavaFX para exibir uma imagem de plataforma. O construtor carrega uma imagem específica para a plataforma, define sua posição inicial e ajusta seu tamanho de acordo com os parâmetros fornecidos. Se a imagem não for encontrada, uma mensagem de erro é exibida no console.
 
-    jump(): Define a velocidade vertical do jogador para a força do pulo e marca o jogador como não estando em uma plataforma.
-    update(): Atualiza a posição do jogador com base na gravidade, aceleração e atrito, e atualiza a caixa de colisão.
-    updateCollisionBox(): Sincroniza a posição da caixa de colisão com a posição do jogador.
-    moveLeft(): Define a aceleração horizontal do jogador para mover à esquerda.
-    moveRight(): Define a aceleração horizontal do jogador para mover à direita.
+    MovingObstacle representa um obstáculo móvel no jogo, derivando da classe Plataform. Ela adiciona funcionalidade para movimento horizontal, onde o obstáculo alterna sua direção ao atingir as bordas da tela. O construtor inicializa a posição e o tamanho do obstáculo móvel com base nos parâmetros fornecidos.
 
+    classe SoundEffect é responsável por gerenciar e reproduzir efeitos sonoros no jogo. Ela utiliza a API MediaPlayer do JavaFX para carregar e controlar arquivos de áudio especificados pelo caminho audioPath. O construtor inicializa o reprodutor de mídia com o arquivo de áudio correspondente e configura a repetição indefinida se o áudio deve ser reproduzido em loop. Os métodos play() e stop() são utilizados para iniciar e parar a reprodução do áudio, respectivamente.
 
  
 
